@@ -1,7 +1,15 @@
 // Copyright 2023 System76 <info@system76.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
+// Systems without libudev and i2c-dev get empty stand-ins for the two crates
+// (see Cargo.toml); they report that there is no backlight device.
+#[cfg(not(target_os = "linux"))]
+extern crate ddc_hi_stub as ddc_hi;
+#[cfg(not(target_os = "linux"))]
+extern crate udev_stub as udev;
+
 use brightness_device::BrightnessDevice;
+#[cfg(feature = "audio")]
 use cosmic_config::ConfigGet;
 use futures::lock::Mutex;
 use logind_session::LogindSessionProxy;
@@ -52,6 +60,7 @@ static DBUS_PATH: &str = "/com/system76/CosmicSettingsDaemon";
 
 struct SettingsDaemon {
     /// Directly access varlink daemon methods within the DBus daemon.
+    #[cfg(feature = "audio")]
     varlink_daemon: Arc<tokio::sync::Mutex<cosmic_settings_varlink_server::DaemonInner>>,
     logind_session: Option<LogindSessionProxy<'static>>,
     a11y_session: Option<Mutex<a11y_zbus::StatusProxy<'static>>>,
@@ -272,6 +281,7 @@ impl SettingsDaemon {
     }
 
     async fn volume_up(&self) {
+        #[cfg(feature = "audio")]
         if let Err(why) = self
             .varlink_daemon
             .lock()
@@ -285,6 +295,7 @@ impl SettingsDaemon {
     }
 
     async fn volume_down(&self) {
+        #[cfg(feature = "audio")]
         if let Err(why) = self
             .varlink_daemon
             .lock()
@@ -497,9 +508,12 @@ async fn main() -> ExitCode {
 
     let result: zbus::Result<()> = task::LocalSet::new()
         .run_until(async move {
+            #[cfg(feature = "audio")]
             let (varlink_daemon, varlink_backend) = cosmic_settings_varlink_server::init().await;
+            #[cfg(feature = "audio")]
             let varlink_daemon_context = varlink_daemon.0.clone();
 
+            #[cfg(feature = "audio")]
             task::spawn_local(async move {
                 futures::future::select(Box::pin(varlink_daemon.run()), Box::pin(varlink_backend))
                     .await;
@@ -612,6 +626,7 @@ async fn main() -> ExitCode {
             let watched_configs = Arc::new(RwLock::new(HashMap::new()));
             let watched_states = Arc::new(RwLock::new(HashMap::new()));
             let settings_daemon = SettingsDaemon {
+                #[cfg(feature = "audio")]
                 varlink_daemon: varlink_daemon_context.clone(),
                 logind_session: logind_session.ok(),
                 a11y_session: a11y_session.ok().map(Mutex::new),
@@ -715,8 +730,10 @@ async fn main() -> ExitCode {
                             {
                                 theme::sync_gnome_cursor_size();
                             } else if id.as_str() == cosmic_settings_daemon_config::NAME {
+                                #[cfg(feature = "audio")]
                                 let mut daemon = varlink_daemon_context.lock().await;
 
+                                #[cfg(feature = "audio")]
                                 let mono_sound = daemon
                                     .audio_server
                                     .backend
@@ -726,6 +743,7 @@ async fn main() -> ExitCode {
                                     .daemon_config_context
                                     .get::<bool>("mono_sound");
 
+                                #[cfg(feature = "audio")]
                                 match mono_sound {
                                     Ok(enabled) => {
                                         _ = daemon.audio_server.set_mono(enabled).await;

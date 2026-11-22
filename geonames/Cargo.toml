@@ -6,6 +6,17 @@ publish = false
 
 [dependencies]
 bitcode = "0.6"
-reqwest = "0.13"
+reqwest = { version = "0.13", optional = true }
 tokio = { version = "1.54", features = ["full"] }
-zip = "9"
+zip = { version = "9", optional = true }
+
+[features]
+default = ["generate"]
+# The generator binary downloads and unpacks the GeoNames dump. The library,
+# which only decodes the bundled data, needs neither.
+generate = ["dep:reqwest", "dep:zip"]
+
+[[bin]]
+name = "geonames"
+path = "src/main.rs"
+required-features = ["generate"]

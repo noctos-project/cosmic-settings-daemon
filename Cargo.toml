@@ -29,21 +29,20 @@ features = ["tokio"]
 [dependencies]
 anyhow = "1.0.104"
 chrono = "0.4.45"
-cosmic-comp-config = { git = "https://github.com/pop-os/cosmic-comp" }
+cosmic-comp-config = { git = "https://github.com/pop-os/cosmic-comp", default-features = false }
 cosmic-config.workspace = true
 a11y-zbus = { git = "https://github.com/pop-os/dbus-settings-bindings" }
-cosmic-settings-audio-server = { path = "./audio-server" }
+cosmic-settings-audio-server = { path = "./audio-server", optional = true }
+cosmic-settings-varlink-server = { path = "./varlink-server", optional = true }
 cosmic-settings-daemon-config = { path = "./cosmic-settings-daemon-config", features = [
     "greeter",
 ] }
-cosmic-settings-varlink-server = { path = "./varlink-server" }
 cosmic-theme.export = true
 cosmic-theme.workspace = true
-ddc-hi = "0.4.1"
 dirs = "7.0.0"
 futures = "0.3.34"
 futures-util = "0.3.34"
-geonames = { path = "geonames" }
+geonames = { path = "geonames", default-features = false }
 libcosmic = { git = "https://github.com/pop-os/libcosmic", default-features = false }
 locale1-zbus = { git = "https://github.com/pop-os/dbus-settings-bindings" }
 log = "0.4.35"
@@ -56,7 +55,6 @@ tokio = { version = "1.54.1", features = ["macros", "net", "rt", "signal"] }
 tokio-stream = "0.1.19"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
-udev = "0.9.3"
 upower-zbus = { git = "https://github.com/pop-os/dbus-settings-bindings" }
 walkdir = "2.5.0"
 zbus = { version = "6.2.1", default-features = false, features = ["tokio"] }
@@ -70,3 +68,32 @@ calloop-wayland-source = "0.4.1"
 # iced_futures = { git = "https://github.com/pop-os/libcosmic//", branch = "bundles" }
 # cosmic-config = { git = "https://github.com/pop-os/libcosmic//", branch = "bundles" }
 # cosmic-theme = { git = "https://github.com/pop-os/libcosmic//", branch = "bundles" }
+
+[features]
+default = ["audio"]
+# Volume control and the varlink audio service, through PipeWire.
+audio = ["dep:cosmic-settings-audio-server", "dep:cosmic-settings-varlink-server"]
+
+# Backlight control needs libudev and DDC/CI over i2c-dev. Elsewhere the two
+# crates are replaced by empty stand-ins that report "no devices"; main.rs
+# imports them under the original names.
+[target.'cfg(target_os = "linux")'.dependencies]
+ddc-hi = "0.4.1"
+udev = "0.9.3"
+
+[target.'cfg(not(target_os = "linux"))'.dependencies]
+ddc-hi-stub = { path = "noctos-stubs/ddc-hi" }
+udev-stub = { path = "noctos-stubs/udev" }
+
+# NoctOS: illumos fixes for the event-loop stack, shared with the other COSMIC
+# forks through the sibling cosmic-comp checkout.
+[patch.crates-io]
+calloop = { path = "../cosmic-comp/noctos-vendor/calloop" }
+polling = { path = "../cosmic-comp/noctos-vendor/polling" }
+wayland-backend = { path = "../cosmic-comp/noctos-vendor/wayland-backend" }
+drm-ffi = { path = "../cosmic-comp/noctos-vendor/drm-ffi-0.7" }
+
+# NoctOS: the fork's cosmic-comp-config makes libinput optional (upstream
+# links it, and with it libudev, unconditionally). Only XkbConfig is used here.
+[patch."https://github.com/pop-os/cosmic-comp"]
+cosmic-comp-config = { path = "../cosmic-comp/cosmic-comp-config" }

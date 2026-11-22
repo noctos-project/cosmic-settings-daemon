@@ -1,0 +1,7 @@
+[package]
+name = "udev-stub"
+version = "0.9.3"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "Empty stand-in for the udev crate on systems without libudev (NoctOS/illumos)."

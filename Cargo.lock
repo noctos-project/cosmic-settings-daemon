@@ -562,8 +562,6 @@ dependencies = [
 [[package]]
 name = "calloop"
 version = "0.14.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43b32313e937c8721c9d17ee9bf60699a6402b4b7c2cb6ac1bee0ffcaa4b4e5e"
 dependencies = [
  "bitflags 2.13.2",
  "polling",
@@ -921,10 +919,8 @@ dependencies = [
 [[package]]
 name = "cosmic-comp-config"
 version = "1.0.0"
-source = "git+https://github.com/pop-os/cosmic-comp#63dacd148f634023f904d27e94ce0da93eef6710"
 dependencies = [
  "cosmic-config",
- "input",
  "serde",
 ]
 
@@ -1075,6 +1071,7 @@ dependencies = [
  "cosmic-settings-varlink-server",
  "cosmic-theme",
  "ddc-hi",
+ "ddc-hi-stub",
  "dirs",
  "futures",
  "futures-util",
@@ -1092,6 +1089,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "udev 0.9.3",
+ "udev-stub",
  "upower-zbus",
  "walkdir",
  "zbus 6.2.1",
@@ -1361,6 +1359,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ddc-hi-stub"
+version = "0.4.1"
+
+[[package]]
 name = "ddc-i2c"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1574,8 +1576,6 @@ dependencies = [
 [[package]]
 name = "drm-ffi"
 version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41334f8405792483e32ad05fbb9c5680ff4e84491883d2947a4757dc54cb2ac6"
 dependencies = [
  "drm-sys",
  "rustix 0.38.44",
@@ -2869,25 +2869,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "input"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9793345a65d71317763a33066b5d8351f8760dde8d4930fe9e39b5f14a7959d"
-dependencies = [
- "bitflags 2.13.2",
- "input-sys",
- "libc",
- "log",
- "udev 0.9.3",
-]
-
-[[package]]
-name = "input-sys"
-version = "1.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36eee07d8e02bd95bf52b2e642cf13d33701b94c6e4b04fbf1d1fb07e9cb19e7"
-
-[[package]]
 name = "intl-memoizer"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4139,12 +4120,11 @@ dependencies = [
 [[package]]
 name = "polling"
 version = "3.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d0e4f59085d47d8241c88ead0f274e8a0cb551f3625263c05eb8dd897c34218"
 dependencies = [
  "cfg-if",
  "concurrent-queue",
  "hermit-abi 0.5.3",
+ "libc",
  "pin-project-lite",
  "rustix 1.1.6",
  "windows-sys 0.61.2",
@@ -5873,6 +5853,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "udev-stub"
+version = "0.9.3"
+
+[[package]]
 name = "uds_windows"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6177,11 +6161,10 @@ dependencies = [
 [[package]]
 name = "wayland-backend"
 version = "0.3.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38a91b4eaddff87b1cd1074985e3713da4af2c49742d1b356b2c01670a67a078"
 dependencies = [
  "cc",
  "downcast-rs",
+ "libc",
  "rustix 1.1.6",
  "scoped-tls",
  "smallvec",
