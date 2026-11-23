@@ -88,6 +88,9 @@ udev-stub = { path = "noctos-stubs/udev" }
 # NoctOS: illumos fixes for the event-loop stack, shared with the other COSMIC
 # forks through the sibling cosmic-comp checkout.
 [patch.crates-io]
+# NoctOS: notify with a native illumos backend (event ports), so that
+# config-file changes are noticed as they are on Linux.
+notify = { path = "../cosmic-comp/noctos-vendor/notify" }
 calloop = { path = "../cosmic-comp/noctos-vendor/calloop" }
 polling = { path = "../cosmic-comp/noctos-vendor/polling" }
 wayland-backend = { path = "../cosmic-comp/noctos-vendor/wayland-backend" }
